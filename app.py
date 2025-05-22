@@ -1,86 +1,150 @@
 #enter environment - .\env\Scripts\activate 
 #INITIALIZE DATABASE ---> python -c "from app import 
 # app, db; app.app_context().push(); db.create_all(); print('Database initialized')"
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, url_for
 from flask import jsonify
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db' 
-db = SQLAlchemy(app)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///students.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db = SQLAlchemy(app) #initialize database
 
-class Todo(db.Model):
-    
+class Student(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    content = db.Column(db.String(200), nullable=False)
-    date_created = db.Column(db.DateTime, default=datetime.utcnow)
-
-    def __repr__(self):
-        return '<Task %r>' % self.id
-@app.route('/', methods=['POST', 'GET'])
-def index():
-    if request.method == "POST":
-        task_content = request.form['content']
-        new_task = Todo(content=task_content)
-
-        try:
-            db.session.add(new_task)
-            db.session.commit()
-            return redirect('/')
-        except:
-            return 'There was an issue adding your task'
-    else:
-        tasks = Todo.query.order_by(Todo.date_created).all() #28:31
-        return render_template('index.html', tasks = tasks)
+    first_name = db.Column(db.String(20), nullable=False)
+    last_name = db.Column(db.String(20), nullable=False)
+    student_id = db.Column(db.String(20), unique=True)
+    email = db.Column(db.String(50), unique=True)
     
+#doesnt do anything cuz i deleted the date field in the Student class ^^^
+    def to_dict(self):
+        return {
+        'id': self.id,
+        'first_name': self.first_name,
+        'last_name': self.last_name,
+        'email': self.email,
+        'date_registered': self.date_registered.isoformat()
+        }
+        
 
-@app.route('/delete/<int:id>')
+
+#display and process form
+@app.route('/', methods=['GET', 'POST'])
+def index():
+    #post resquest (form submission)
+    if request.method == 'POST':
+        try: 
+            new_student = Student(
+                first_name=request.form['first_name'],
+                last_name=request.form['last_name'],
+                student_id=request.form['student_id'],
+                email=request.form['email']
+            )
+            #add to database and commit
+            db.session.add(new_student)
+            db.session.commit()
+            return redirect(url_for('index'))
+        except Exception as e:
+            db.session.rollback()
+        return redirect(url_for('index'))
+    
+    students = Student.query.all()
+    return render_template('index.html', students=students)
+
+
+@app.route('/delete/<int:id>', methods = ["POST"])
 def delete(id):
-    task_to_delete = Todo.query.get_or_404(id)
-
+    student = Student.query.get_or_404(id)
     try:
-        db.session.delete(task_to_delete)
+        db.session.delete(student)
         db.session.commit()
         return redirect('/')
-    except:
-        return 'There was a problem deleting that task'
+    except Exception as e:
+        db.session.rollback()
+    return redirect(url_for('index'))
     
 
-@app.route('/update/<int:id>', methods = ['GET', 'POST'])
+@app.route('/update/<int:id>', methods=['GET', 'POST'])
 def update(id):
-    task = Todo.query.get_or_404(id)
-
+    student = Student.query.get_or_404(id)
     if request.method == 'POST':
-        task.content = request.form['content']
-
+        student.first_name = request.form['first_name']
+        student.last_name = request.form['last_name']
+        student.student_id = request.form.get('student_id', '')
+        student.email = request.form['email']
         try:
             db.session.commit()
             return redirect('/')
-        except:
-            return 'There was an issue updating your task'
-    else:
-        return render_template('update.html', task=task)
+        except Exception as e:
+            db.session.rollback()
+    return render_template('update.html', student=student)
 
-@app.route('/api/tasks', methods=['GET'])
-def api_get_tasks():
-    tasks = Todo.query.order_by(Todo.date_created).all()
-    return jsonify([{'id': t.id, 'content': t.content} for t in tasks])
 
-@app.route('/api/tasks', methods=['POST'])
-def api_add_task():
+#API's
+
+#get all students
+@app.route('/api/students', methods=['GET'])
+def api_get_students():
+    students = Student.query.order_by(Student.date_registered).all()
+    return jsonify([student.to_dict() for student in students])
+
+#create new students
+@app.route('/api/students', methods=['POST'])
+def api_add_student():
     data = request.get_json()
-    new_task = Todo(content=data['content'])
-    db.session.add(new_task)
-    db.session.commit()
-    return jsonify({'id': new_task.id}), 201
+    try:
+        new_student = Student(
+            first_name=data['first_name'],
+            last_name=data['last_name'],
+            student_id=data.get('student_id', ''),
+            email=data['email']
+        )
+        db.session.add(new_student)
+        db.session.commit()
+        return jsonify(new_student.to_dict()), 201
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error':str(e)}), 400
 
-@app.route('/api/tasks/<int:id>', methods=['DELETE'])
-def api_delete_task(id):
-    task = Todo.query.get_or_404(id)
-    db.session.delete(task)
-    db.session.commit()
-    return jsonify({'message': 'Task deleted'}), 200
+#get one stuednt
+@app.route('/api/students/<int:id>', methods = ['GET'])
+def api_get_student(id):
+    student = Student.query.get_or_404(id)
+    return jsonify(student.to_dict())
 
-if __name__ == "__main__":
+#updates students info
+@app.route('/api/students/<int:id>', methods=['PUT'])
+def api_update_student(id):
+    student = Student.query.get_or_404(id)
+    data = request.get_json()
+    try:
+        student.first_name = data['first_name']
+        student.last_name = data['last_name']
+        student.student_id = data.get('student_id', '')
+        student.email = data['email']
+        db.session.commit()
+        return jsonify(student.to_dict()), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 400
+
+
+@app.route('/api/students/<int:id>', methods=['DELETE'])
+def api_delete_student(id):
+    student = Student.query.get_or_404(id)
+    try:
+        db.session.delete(student)
+        db.session.commit()
+        return jsonify({'message': 'Student deleted'}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 400
+
+
+
+if __name__ == '__main__':
+    with app.app_context():
+        db.create_all()
     app.run(debug=True)

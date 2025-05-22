@@ -1,18 +1,22 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
+
 
 {% block head %}
-<title>My App</title>
-{% endblock %}
+<title>Task Master</title>
+{%endblock%}
 
 {% block body %}
-<div class="content">
-    <h1 style="text-align:center">Update Task</h1>
+<div class="container">
+    <h1 style = "text-align: center;">Update Student</h1>
 
-    <div class="form">
-        <form action="/update/{{ task.id }}" method="POST">
-            <input type="text" name="content" id="content" value="{{ task.content }}">
-            <input type="submit" value="Update">
-        </form>
-    </div>
+    
+    <form method="POST" class="student-form">
+        <input type="text" name="first_name" value="{{ student.first_name }}" required>
+        <input type="text" name="last_name" value="{{ student.last_name }}" required>
+        <input type="text" name="student_id" value="{{ student.student_id }}">
+        <input type="email" name="email" value="{{ student.email }}" required>
+        <button type="submit">Update</button>
+        <a href="{{ url_for('index') }}" class="btn btn-cancel">Cancel</a>
+    </form>
 </div>
 {% endblock %}
