@@ -95,7 +95,7 @@ def update(id):
 #get all students
 @app.route('/api/students', methods=['GET'])
 def api_get_students():
-    students = Student.query.order_by(Student.date_registered).all()#student reg doesnt do nth
+    students = Student.query.order_by(Student.date_registered).all()#student reg doesnt do anything
     return jsonify([student.to_dict() for student in students])
 
 #create new students
