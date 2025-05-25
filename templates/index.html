@@ -7,7 +7,14 @@
 <body>
     <div class="container">
         <h1>Student Registration SC4K</h1>
-        
+    
+    {% if duplicate_exists %}
+    <div class="duplicate-error">
+        A student with that ID or email already exists!
+    </div>
+    {% endif %}
+
+    
         <form method="POST" class="student-form">
             <input type="text" name="first_name" placeholder="First Name*" required>
             <input type="text" name="last_name" placeholder="Last Name*" required>

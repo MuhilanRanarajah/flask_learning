@@ -35,10 +35,18 @@ class Student(db.Model):
 def index():
     #post resquest (form submission)
     if request.method == 'POST':
+        duplicate = Student.query.filter(
+            (Student.student_id ==request.form['student_id']) |
+            (Student.email==request.form['email']) |
+            (Student.first_name == request.form['first_name']) 
+        ).first()
+
+        if duplicate:
+            students = Student.query.all()
+            return render_template('index.html', students=students, duplicate_exists = True)
         try: 
             new_student = Student(
                 first_name=request.form['first_name'],
-                last_name=request.form['last_name'],
                 student_id=request.form['student_id'],
                 email=request.form['email']
             )
@@ -87,7 +95,7 @@ def update(id):
 #get all students
 @app.route('/api/students', methods=['GET'])
 def api_get_students():
-    students = Student.query.order_by(Student.date_registered).all()
+    students = Student.query.order_by(Student.date_registered).all()#student reg doesnt do nth
     return jsonify([student.to_dict() for student in students])
 
 #create new students
