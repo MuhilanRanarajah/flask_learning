@@ -13,8 +13,12 @@
     <form method="POST" class="student-form">
         <input type="text" name="first_name" value="{{ student.first_name }}" required>
         <input type="text" name="last_name" value="{{ student.last_name }}" required>
-        <input type="text" name="student_id" value="{{ student.student_id }}">
+        <input type="text" name="student_id" value="{{ student.student_id }}" required>
         <input type="email" name="email" value="{{ student.email }}" required>
+        <input type="text" name="parents_full_name" value="{{ student.parents_full_name }}" required>
+        <input type="date" name="dob" value="{{ student.dob }}" required>
+        <input type="text" name="address" value="{{ student.address }}" required>
+
         <button type="submit">Update</button>
         <a href="{{ url_for('index') }}" class="btn btn-cancel">Cancel</a>
     </form>

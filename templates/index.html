@@ -6,7 +6,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>Student Registration SC4K</h1>
+        <h1 class ="page_title"> Student Registration SC4K</h1>
     
     {% if duplicate_exists %}
     <div class="duplicate-error">
@@ -16,10 +16,14 @@
 
     
         <form method="POST" class="student-form">
-            <input type="text" name="first_name" placeholder="First Name*" required>
-            <input type="text" name="last_name" placeholder="Last Name*" required>
-            <input type="text" name="student_id" placeholder="Student ID*" required>
+            <input type="text" name="first_name" placeholder="First Name" required>
+            <input type="text" name="last_name" placeholder="Last Name" required>
+            <input type="text" name="student_id" placeholder="Student ID" required>
             <input type="email" name="email" placeholder="Email" required>
+            <input type="text" name="parents_full_name" placeholder="Parents Full Name" required>
+            <input type="date" name="dob" placeholder="Date of Birth" required>
+            <input type="text" name="address" placeholder="Address" required>
+
             <button type="submit">Register Student</button>
         </form>
 
@@ -30,6 +34,9 @@
                     <th>Last Name</th>
                     <th>Student ID</th>
                     <th>Email</th>
+                    <th>Parents Full Name</th>
+                    <th>Date of Birth</th>
+                    <th>Address</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -40,6 +47,10 @@
                     <td>{{ student.last_name }}</td>
                     <td>{{ student.student_id }}</td>
                     <td>{{ student.email }}</td>
+                    <td>{{ student.parents_full_name }}</td>
+                    <td>{{ student.dob }}</td>
+                    <td>{{ student.address }}</td>
+
                     <td class="action-buttons">
                         <a href="{{ url_for('update', id=student.id) }}" class="btn btn-edit">Edit</a>
                         <form action="{{ url_for('delete', id=student.id) }}" method="POST" style="display: inline;">
