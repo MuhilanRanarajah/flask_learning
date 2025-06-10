@@ -20,8 +20,12 @@ class Student(db.Model):
     student_id = db.Column(db.String(20), unique=True)
     email = db.Column(db.String(50), unique=True)
     parents_full_name = db.Column(db.String(50), nullable = False)
-    dob = db.Column(db.String(50), nullable = False)
-    address = db.Column(db.String(50), nullable = False)
+    age = db.Column(db.String(2), nullable = False)
+    address = db.Column(db.String(20), nullable = False)
+    phone_number =db.Column(db.String(10), nullable = False)
+    courses =db.Column(db.String(10), nullable = False)
+    teacher = db.Column(db.String(100))
+
 
 
 #doesnt do anything cuz i deleted the date field in the Student class ^^^
@@ -33,7 +37,7 @@ def to_dict(self):
         'student_id': self.student_id,
         'email': self.email,
         'parents_full_name': self.parents_full_name,
-        'dob': self.dob,
+        'age': self.age,
         'address': self.address
     }
         
@@ -59,8 +63,13 @@ def index():
                 student_id=request.form['student_id'],
                 email=request.form['email'],
                 parents_full_name=request.form['parents_full_name'],
-                dob=request.form['dob'],
-                address=request.form['address']
+                age=request.form['age'],
+                address=request.form['address'],
+                phone_number=request.form['phone_number'],
+                courses=request.form['courses'],
+                teacher_id=request.form['teacher_id']
+
+
             )
             #add to database and commit
             db.session.add(new_student)
@@ -95,8 +104,12 @@ def update(id):
         student.student_id = request.form.get('student_id', '')
         student.email = request.form['email']
         student.parents_full_name = request.form['parents_full_name']
-        student.dob = request.form['dob']
+        student.age = request.form['age']
         student.address = request.form['address']
+        student.phone_number = request.form['phone_number']
+        student.courses = request.form['courses']
+        student.teacher_id = request.form['teacher_id']
+
 
         try:
             db.session.commit()
@@ -105,8 +118,38 @@ def update(id):
             db.session.rollback()
     return render_template('update.html', student=student)
 
+@app.route('/teacher_view')
+def teacher_view():
+    students = Student.query.all()
+    
+    teacher_students = []
+    for student in students:
+        teacher_students.append({
+            'id': student.id,
+            'name': f"{student.first_name} {student.last_name}",
+            'level': student.courses,  
+            'day': "Mon",  # Placeholder (add w needs to be added)
+            'time': "4:30 PM",  # Placeholder
+            'email': student.email,
+            'phone': student.phone_number
+        })
+    
+    return render_template('teacher_view.html', students=teacher_students)
 
-#API's
+@app.route('/teachers')
+def teachers_table():
+    students = Student.query.all()  # get all students from DB
+    return render_template('teachers.html', students=students)
+
+@app.route('/')
+def student_registration():
+    students = Student.query.all()  # get all students
+    return render_template('index.html', students=students)
+
+@app.route('/teachers')
+def teachers_table():
+    students = Student.query.all()  # get all students
+    return render_template('indexT.html', students=students)
 
 #get all students
 @app.route('/api/students', methods=['GET'])
@@ -125,8 +168,12 @@ def api_add_student():
             student_id=data.get('student_id', ''),
             email=data['email'],
             parents_full_name=data['parents_full_name'],
-            dob=data['dob'],
-            address=data['address']
+            age=data['age'],
+            address=data['address'],
+            phone_number=data['phone_number'],
+            courses=data['courses'],
+            teacher_id=data['teacher_id']
+
         )
         db.session.add(new_student)
         db.session.commit()
@@ -152,8 +199,11 @@ def api_update_student(id):
         student.student_id = data.get('student_id', '')
         student.email = data['email']
         student.parents_full_name=data['parents_full_name']
-        student.dob=data['dob']
+        student.age=data['age']
         student.address=data['address']
+        student.phone_number=data['phone_number']
+        student.courses=data['courses']
+        student.teacher_id=data['teacher_id']
 
         db.session.commit()
         return jsonify(student.to_dict()), 200

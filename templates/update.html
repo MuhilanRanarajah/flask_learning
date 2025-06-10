@@ -18,6 +18,8 @@
         <input type="text" name="parents_full_name" value="{{ student.parents_full_name }}" required>
         <input type="date" name="dob" value="{{ student.dob }}" required>
         <input type="text" name="address" value="{{ student.address }}" required>
+        <input type="text" name="phone_number" value="{{ student.phone_number }}" required>
+        <input type="select" name="courses" value="{{ student.courses }}" required>
 
         <button type="submit">Update</button>
         <a href="{{ url_for('index') }}" class="btn btn-cancel">Cancel</a>

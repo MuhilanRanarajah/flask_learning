@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Teachers Table</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/mainT.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Teachers Table</h1>
+            <a href="{{ url_for('index') }}" style="float: right; margin-top: -40px;">Back to Teacher Management</a>
+        </header>
+        
+        <div class="filters">
+            <select id="teacherFilter" onchange="filterTable()">
+                <option value="">All Teachers</option>
+                {% for teacher in teachers %}
+                <option value="{{ teacher.name }}">{{ teacher.name }}</option>
+                {% endfor %}
+            </select>
+            
+            <select id="dayFilter" onchange="filterTable()">
+                <option value="">All Days</option>
+                <option>Monday</option>
+                <option>Tuesday</option>
+                <option>Wednesday</option>
+                <option>Thursday</option>
+                <option>Friday</option>
+                <option>Saturday</option>
+                <option>Sunday</option>
+            </select>
+            
+            <select id="levelFilter" onchange="filterTable()">
+                <option value="">All Levels</option>
+                <option>1</option>
+                <option>2</option>
+                <option>3</option>
+            </select>
+            
+            <input type="text" id="nameSearch" placeholder="Search student" onkeyup="filterTable()">
+        </div>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Student Name</th>
+                    <th>Teacher</th>
+                    <th>Level</th>
+                    <th>Day</th>
+                    <th>Time</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="studentTableBody">
+                {% for teacher in teachers %}
+                    {% for student in teacher_students[teacher.id] %}
+                    <tr>
+                        <td>{{ student[0] }}</td>
+                        <td>{{ student[1] }}</td>
+                        <td>{{ teacher.name }}</td>
+                        <td>{{ student[2] }}</td>
+                        <td>{{ student[3] }}</td>
+                        <td>{{ student[4] }}</td>
+                        <td>{{ student[5] }}</td>
+                        <td>{{ student[6] }}</td>
+                        <td>
+                            <form action="{{ url_for('delete_assignment', teacher_id=teacher.id, student_id=student[0]) }}" method="post" style="display:inline;">
+                                <button type="submit">Remove Assignment</button>
+                            </form>
+
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        function filterTable() {
+            const teacher = document.getElementById('teacherFilter').value.toLowerCase();
+            const day = document.getElementById('dayFilter').value.toLowerCase();
+            const level = document.getElementById('levelFilter').value.toLowerCase();
+            const search = document.getElementById('nameSearch').value.toLowerCase();
+            
+            const rows = document.querySelectorAll('#studentTableBody tr');
+            
+            rows.forEach(row => {
+                const teacherMatch = teacher === '' || row.cells[2].textContent.toLowerCase() === teacher;
+                const dayMatch = day === '' || row.cells[4].textContent.toLowerCase() === day;
+                const levelMatch = level === '' || row.cells[3].textContent.toLowerCase() === level;
+                const nameMatch = row.cells[1].textContent.toLowerCase().includes(search);
+                
+                row.style.display = (teacherMatch && dayMatch && levelMatch && nameMatch) ? '' : 'none';
+            });
+        }
+    </script>
+</body>
+</html>

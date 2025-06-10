@@ -21,9 +21,21 @@
             <input type="text" name="student_id" placeholder="Student ID" required>
             <input type="email" name="email" placeholder="Email" required>
             <input type="text" name="parents_full_name" placeholder="Parents Full Name" required>
-            <input type="date" name="dob" placeholder="Date of Birth" required>
+            <input type="text" name="age" placeholder="Age of Student" required>
             <input type="text" name="address" placeholder="Address" required>
-
+            <input type="text" name="phone_number" placeholder="Phone Number" required>
+            
+            <select name="courses" required>
+                <option value="" disabled selected>Select a course</option>
+                <option value="Math">Math</option>
+                <option value="Science">Science</option>
+                <option value="English">English</option>
+                <option value="History">History</option>
+                <option value="Computer Science">Computer Science</option>
+                <option value="Art">Art</option>
+                <option value="Music">Music</option>
+                <option value="Physical Education">Physical Education</option>
+            </select>
             <button type="submit">Register Student</button>
         </form>
 
@@ -35,8 +47,10 @@
                     <th>Student ID</th>
                     <th>Email</th>
                     <th>Parents Full Name</th>
-                    <th>Date of Birth</th>
+                    <th>Age</th>
                     <th>Address</th>
+                    <th>Phone Number</th>
+                    <th>Courses</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -48,8 +62,10 @@
                     <td>{{ student.student_id }}</td>
                     <td>{{ student.email }}</td>
                     <td>{{ student.parents_full_name }}</td>
-                    <td>{{ student.dob }}</td>
+                    <td>{{ student.age }}</td>
                     <td>{{ student.address }}</td>
+                    <td>{{ student.phone_number }}</td>
+                    <td>{{ student.courses }}</td>
 
                     <td class="action-buttons">
                         <a href="{{ url_for('update', id=student.id) }}" class="btn btn-edit">Edit</a>

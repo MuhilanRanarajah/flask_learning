@@ -1,0 +1,24 @@
+{% extends "baseT.html" %}
+
+
+{% block head %}
+<title>Task Master</title>
+{%endblock%}
+
+{% block body %}
+<div class="container">
+    <h1 style = "text-align: center;">Update Student</h1>
+
+    
+    <form method="POST" class="assignment-form">
+        <input type="text" name="first_name" value="{{ assignment.first_name }}" required>
+        <input type="email" name="email" value="{{ assignment.email }}" required>
+        <input type="text" name="day" value="{{ assignment.day }}" required>
+        <input type="text" name="phone_number" value="{{ assignment.phone_number }}" required>
+        <input type="text" name="time" value="{{ assignment.time }}" required>
+
+        <button type="submit">Update</button>
+        <a href="{{ url_for('indexT') }}" class="btn btn-cancel">Cancel</a>
+    </form>
+</div>
+{% endblock %}

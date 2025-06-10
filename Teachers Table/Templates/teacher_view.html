@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher View - SC4K</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/teacher_view.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1 class="page_title">Teacher Portal - Student Assignments</h1>
+        
+        <!-- Teacher Filter (functional) -->
+        <div class="teacher-controls">
+            <select class="teacher-select" id="teacherFilter">
+                <option value="all">All Students</option>
+                <option value="robotics">Robotics</option>
+                <option value="level1">Level 1</option>
+                <option value="level2">Level 2</option>
+                <option value="level3">Level 3</option>
+            </select>
+            <input type="text" id="studentSearch" placeholder="Search students...">
+        </div>
+
+        <!-- Student Table (read-only) -->
+        <table class="teacher-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Name</th>
+                    <th>Level</th>
+                    <th>Day</th>
+                    <th>Time</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for student in students %}
+                <tr>
+                    <td>{{ student.id }}</td>
+                    <td>{{ student.name }}</td>
+                    <td>{{ student.level }}</td>
+                    <td>{{ student.day }}</td>
+                    <td>{{ student.time }}</td>
+                    <td>{{ student.email }}</td>
+                    <td>{{ student.phone }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        // Simple client-side filtering
+        document.getElementById('teacherFilter').addEventListener('change', filterStudents);
+        document.getElementById('studentSearch').addEventListener('input', filterStudents);
+        
+        function filterStudents() {
+            const filterValue = document.getElementById('teacherFilter').value.toLowerCase();
+            const searchValue = document.getElementById('studentSearch').value.toLowerCase();
+            const rows = document.querySelectorAll('.teacher-table tbody tr');
+            
+            rows.forEach(row => {
+                const level = row.cells[2].textContent.toLowerCase();
+                const name = row.cells[1].textContent.toLowerCase();
+                const showRow = 
+                    (filterValue === 'all' || level.includes(filterValue)) &&
+                    (name.includes(searchValue));
+                row.style.display = showRow ? '' : 'none';
+            });
+        }
+    </script>
+</body>
+</html>
